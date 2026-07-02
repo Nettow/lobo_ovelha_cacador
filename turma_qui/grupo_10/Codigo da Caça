@@ -1,0 +1,503 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <conio.h>
+#include <time.h>
+
+typedef struct {
+	int x;
+	int y;
+	int velhoy;
+	int velhox;
+	int vivo;
+	int reproducao;
+	
+} entidade;
+
+int spaces;
+
+#define MAX_LOB 100
+#define MAX_OV 100
+#define MAX_CA 100
+#define MAX_AR 100
+#define MAX_CS 100
+
+entidade lobos[MAX_LOB];
+entidade ovelhas[MAX_OV];
+entidade cacadores[MAX_CA];
+entidade arvores[MAX_AR];
+entidade casas[MAX_CS];
+
+int artt;
+int lbtt;
+int ott;
+int ctt;
+int cstt;
+
+void start(int spaces, char map[spaces][spaces]) {
+	for(int i=0; i<spaces; i++) {
+		for(int y=0; y<spaces; y++) {
+			map[i][y] = ' ';
+		}
+	}
+}
+
+void att(int spaces, char map[spaces][spaces]) {
+	system("clear");
+
+    for(int i=0; i<spaces*2.1; i++){
+    	    
+    	printf("-");
+    }
+    printf("\n");
+    
+    for(int i=0; i<spaces; i++) {
+    	printf("|");
+    	for(int y=0; y<spaces; y++) {
+    	    
+    		if(map[i][y]=='l') {
+    		    
+    			printf("🐺 ");
+    		
+    		} else if(map[i][y]=='o') {
+    		   
+    			printf("🐑 ");
+    			
+    		} else if(map[i][y]=='a') {
+    		   
+    			printf("🌲 ");
+    		
+    		} else if(map[i][y]=='c') {
+    		   
+    			printf("🧔 ");
+    			
+    		}else if(map[i][y]=='h') {
+    		    
+    		    printf("🏠 ");
+    		}else{
+    		    printf("  ");
+    		}
+    		    
+    		
+    	}
+    	printf("|");
+    	printf("\n");
+    }
+
+    
+    for(int i=0; i<spaces*2.1; i++){
+    	    
+        printf("-");
+    }
+    printf("\n");
+    sleep(1);
+}
+
+int menu() {
+	int op;
+
+    system("clear");
+    printf("#################\n");
+    printf("#               #\n");
+	printf("#   Bem Vindo   #\n");
+	printf("#               #\n");
+	printf("#################\n");
+	sleep(3);
+	system("clear");
+	printf("#################\n");
+	printf("#               #\n");
+	printf("#       ao      #\n");
+	printf("#               #\n");
+	printf("#################\n");
+	sleep(3);
+	system("clear");
+	printf("####################\n");
+	printf("#                  #\n");
+	printf("#   JOGO DA CAÇA   #\n");
+	printf("#                  #\n");
+	printf("####################\n");
+	sleep(3);
+	system("clear");
+    printf("####################\n");
+	printf("#                  #\n");
+	printf("#   JOGO DA CAÇA   #\n#      1-Jogar     #\n#      2-Sair      #\n");
+	printf("#                  #\n");
+	printf("####################\n");
+	printf("Seleção: ");
+	scanf("%d", &op);
+	system("clear");
+
+	return op;
+
+}
+
+char randon() {
+	int resul;
+
+	resul=rand()%100;
+
+	if(resul<=25) {
+		return 'e';
+	} else if(resul>25 && resul<=50) {
+		return 'd';
+	} else if(resul>50 && resul<=75) {
+		return 'c';
+	} else if(resul>75 && resul<=100) {
+		return 'b';
+	}
+
+	return ' ';
+
+}
+
+void randonspawn(int spaces, char map[spaces][spaces]) {
+	for(int i=0; i<lbtt; i++) {
+
+		do {
+			lobos[i].x = rand()%spaces;
+			lobos[i].y = rand()%spaces;
+		} while(map[lobos[i].x][lobos[i].y] != ' ');
+		map[lobos[i].x][lobos[i].y] = 'l';
+		lobos[i].vivo=1;
+	}
+
+	for(int i=0; i<ott; i++) {
+
+		do {
+			ovelhas[i].x = rand()%spaces;
+			ovelhas[i].y = rand()%spaces;
+		} while(map[ovelhas[i].x][ovelhas[i].y] != ' ');
+		map[ovelhas[i].x][ovelhas[i].y] = 'o';
+		ovelhas[i].vivo=1;
+	}
+
+	for(int i=0; i<ctt; i++) {
+
+		do {
+			cacadores[i].x = rand()%spaces;
+			cacadores[i].y = rand()%spaces;
+		} while(map[cacadores[i].x][cacadores[i].y] != ' ');
+		map[cacadores[i].x][cacadores[i].y] = 'c';
+		cacadores[i].vivo=1;
+	}
+
+	for(int i=0; i<artt; i++) {
+
+		do {
+			arvores[i].x = rand()%spaces;
+			arvores[i].y = rand()%spaces;
+		} while(map[arvores[i].x][arvores[i].y] != ' ');
+		map[arvores[i].x][arvores[i].y] = 'a';
+
+	}
+	
+	for(int i=0; i<artt; i++) {
+
+		do {
+			casas[i].x = rand()%spaces;
+			casas[i].y = rand()%spaces;
+		} while(map[casas[i].x][casas[i].y] != ' ');
+		map[casas[i].x][casas[i].y] = 'h';
+
+	}
+}
+
+entidade movimentacao(entidade e, int spaces, char map[spaces][spaces]) {
+
+	int poss;
+	
+	poss = randon();
+
+	if(poss=='e') {
+		if(e.y<1) {
+			e.y++;
+		} else {
+			e.y--;
+		}
+	} else if(poss=='d') {
+		if(e.y==spaces-1) {
+			e.y--;
+		} else {
+			e.y++;
+		}
+	} else if(poss=='c') {
+		if(e.x<1) {
+			e.x++;
+		} else {
+			e.x--;
+		}
+	} else if(poss=='b') {
+
+		if(e.x==spaces-1) {
+			e.x--;
+		} else {
+			e.x++;
+		}
+		
+	}
+    
+    
+	return e;
+
+}
+
+entidade interacoes(int spaces, char map[spaces][spaces]){
+    
+    for(int i=0; i<lbtt; i++){
+        for(int j=0; j<ott; j++){
+            
+            if(!ovelhas[j].vivo)
+            continue;
+            
+            if(lobos[i].x == ovelhas[j].x && lobos[i].y == ovelhas[j].y){
+                ovelhas[j].vivo = 0;
+            }
+        }
+    }
+    
+    for(int i=0; i<ott; i++){
+        for(int j=0; j<ott; j++){
+            
+            if(!ovelhas[j].vivo)
+            continue;
+            
+            if(i!=j && ovelhas[i].x == ovelhas[j].x && ovelhas[i].y == ovelhas[j].y){
+                if(ovelhas[i].reproducao==1 || ovelhas[j].reproducao==1)continue;
+                if(ott<MAX_OV){
+                    ovelhas[i].reproducao=1;
+                    ovelhas[j].reproducao=1;
+                    ovelhas[ott].x = ovelhas[i].velhox;
+                    ovelhas[ott].y = ovelhas[i].velhoy;
+                    ovelhas[ott].vivo = 1;
+                    ott++;
+                }
+            }
+        }
+    }
+    
+    for(int i=0; i<lbtt; i++){
+        for(int j=i+1; j<lbtt; j++){
+            
+            if(!lobos[i].vivo)
+            continue;
+            
+            if( i!=j && lobos[i].x == lobos[j].x && lobos[i].y == lobos[j].y){
+                if(lobos[i].reproducao==1)continue;
+                if(lbtt<MAX_LOB){
+                    lobos[i].reproducao=1;
+                    lobos[lbtt].x = lobos[i].velhox;
+                    lobos[lbtt].y = lobos[i].velhoy;
+                    lobos[lbtt].vivo = 1;
+                    lbtt++;
+                }
+                
+            }
+        }
+    }
+    
+    for(int i=0; i<lbtt; i++){
+        for(int j=0; j<ctt; j++){
+            
+            if(!lobos[i].vivo)
+            continue;
+            
+            if(cacadores[j].x == lobos[i].x && cacadores[j].y == lobos[i].y){
+                lobos[i].vivo = 0;
+            }
+        }
+    }
+    
+    for(int i=0; i<ott; i++){
+        for(int j=0; j<artt; j++){
+            
+            if(ovelhas[i].x == arvores[j].x && ovelhas[i].y == arvores[j].y){
+                ovelhas[i].x = ovelhas[i].velhox;
+                ovelhas[i].y = ovelhas[i].velhoy;
+            }
+        }
+    }
+    
+    for(int i=0; i<lbtt; i++){
+        for(int j=0; j<artt; j++){
+            
+            if(lobos[i].x == arvores[j].x && lobos[i].y == arvores[j].y){
+                lobos[i].x = lobos[i].velhox;
+                lobos[i].y = lobos[i].velhoy;
+            }
+        }
+    }
+    
+    for(int i=0; i<ctt; i++){
+        for(int j=0; j<artt; j++){
+            
+            if(cacadores[i].x == arvores[j].x && cacadores[i].y == arvores[j].y){
+                cacadores[i].x = cacadores[i].velhox;
+                cacadores[i].y = cacadores[i].velhoy;
+            }
+        }
+    }
+    
+    for(int i=0; i<ctt; i++){
+        for(int j=0; j<cstt; j++){
+            
+            if(cacadores[i].x == casas[j].x && cacadores[i].y == casas[j].y){
+                if(cacadores[i].reproducao==1)continue;
+                if(ctt<MAX_LOB){
+                    cacadores[i].reproducao=1;
+                    cacadores[ctt].x = cacadores[i].velhox;
+                    cacadores[ctt].y = cacadores[i].velhoy;
+                    cacadores[ctt].vivo = 1;
+                    ctt++;
+                }
+            }
+        }
+    }
+}
+
+int vitoria(){
+    
+    int ovi=0;
+    int lvi=0;
+    
+    for(int i=0; i<ott; i++){
+        if(ovelhas[i].vivo == 1){
+            ovi++;
+        }
+    }
+    
+    for(int i=0; i<lbtt; i++){
+       if(lobos[i].vivo == 1){
+           lvi++;
+       }
+    }
+    
+    if(ovi == 0){
+        system("clear");
+        printf("###########################\n");
+        printf("#                         #\n");
+        printf("#   Os Lobos Venceram!!   #\n");
+        printf("#                         #\n");
+        printf("###########################\n");
+        
+        return 1;
+    }
+    
+    if(lvi == 0){
+        system("clear");
+        printf("###########################\n");
+        printf("#                         #\n");
+        printf("#  Os Caçadores Venceram  #\n");
+        printf("#                         #\n");
+        printf("###########################\n");
+        
+        return 1;
+    }
+ 
+    return 0; 
+}
+
+int main() {
+	srand(time(NULL));
+
+	int op;
+	
+	do{
+	    op=menu();
+    	switch(op){
+            case 1:{
+            	do {
+            		printf("Digite o tamanho do mapa\n");
+            		printf("Ela deve estar entre 10 e 40 espaços\n");
+            		scanf("%d", &spaces);
+            		if(spaces<10 || spaces>40){
+            		    printf("Tamanho invalido!");
+            		    fflush(stdout);
+            		    sleep(2);
+            		    system("clear");
+            		}
+            	} while(spaces<10 || spaces>40);
+            
+            	artt = spaces*1.2;
+            	lbtt = spaces*0.2;
+            	ott = spaces*0.4;
+            	ctt = spaces*0.1;
+            	cstt = spaces*0.1;
+            
+            	char map[spaces][spaces];
+            	
+            	start(spaces, map);
+            
+            	randonspawn(spaces, map);
+            
+            	while(1) {
+            	    
+            	    start(spaces, map);
+                    
+            
+            		for(int i=0; i<artt; i++) {
+            			map[arvores[i].x][arvores[i].y] = 'a';
+            		}
+            		
+            		for(int i=0; i<cstt; i++) {
+            			map[casas[i].x][casas[i].y] = 'h';
+            		}
+            
+            
+            		for(int i=0; i<lbtt; i++) {
+            		    
+            		    lobos[i].velhox = lobos[i].x;
+            		    lobos[i].velhoy = lobos[i].y;
+            		    
+                        lobos[i] = movimentacao(lobos[i], spaces, map);
+                        if(lobos[i].vivo == 1){
+                            interacoes(spaces, map);
+            			    map[lobos[i].x][lobos[i].y] = 'l';
+                        }
+            		}
+            
+            		for(int i=0; i<ott; i++) {
+            		    
+            		    ovelhas[i].velhox = ovelhas[i].x;
+            		    ovelhas[i].velhoy = ovelhas[i].y;
+            			
+                        ovelhas[i] = movimentacao(ovelhas[i], spaces, map);
+                        if(ovelhas[i].vivo == 1){
+                            interacoes(spaces, map);
+            			    map[ovelhas[i].x][ovelhas[i].y] = 'o';
+                        }
+            		}
+            
+            		for(int i=0; i<ctt; i++) {
+            		    
+            		    cacadores[i].velhox = cacadores[i].x;
+            		    cacadores[i].velhoy = cacadores[i].y;
+            			
+                        cacadores[i] = movimentacao(cacadores[i], spaces, map);
+            			if(cacadores[i].vivo == 1){
+            			    interacoes(spaces, map);
+            			    map[cacadores[i].x][cacadores[i].y] = 'c';
+                        }
+            		}
+            
+            		att(spaces, map);
+            	    
+                    int ret = vitoria();
+                    
+                    if(ret==1)return 0;
+            	}
+            	break;
+            }
+            case 2:
+                return 0;
+                
+            default:
+                printf("Opção invalida");
+                fflush(stdout);
+                sleep(1);
+                system("clear");
+                
+    	}
+    	system("clear");
+	}while(op!=1 || op!=2);
+	return 0;
+}
